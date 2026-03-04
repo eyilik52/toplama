@@ -5,81 +5,184 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Toplama Oyunu</title>
   <style>
-    :root { font-family: Arial, sans-serif; }
-    body { margin:0; background:#0b1220; color:#e5e7eb; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 18px; }
-    .card { background:#0f1b33; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    h1 { margin:0 0 10px; font-size: 20px; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .row > * { flex: 1 1 auto; }
-    label { font-size: 13px; opacity:.9; display:block; margin-bottom:6px; }
-    select, input { width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0b1220; color:#e5e7eb; font-size:16px; }
-    button { padding:12px 14px; border:0; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; }
-    .btn { background:#f59e0b; color:#111827; }
-    .btn2 { background:#22c55e; color:#081018; }
-    .btn3 { background:#334155; color:#e5e7eb; }
-    .big { font-size: 44px; font-weight: 800; letter-spacing: .5px; text-align:center; margin: 14px 0; }
-    .meta { display:flex; gap:10px; flex-wrap:wrap; }
-    .pill { padding:8px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); font-size:13px; }
-    .msg { margin-top:12px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0b1220; }
-    .ok { border-color: rgba(34,197,94,.5); }
-    .bad { border-color: rgba(239,68,68,.5); }
-    .muted { opacity:.85; font-size: 13px; line-height: 1.35; }
-    .footer { margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --text:#e5e7eb;
+      --muted:rgba(229,231,235,.75);
+      --border:rgba(255,255,255,.10);
+      --btn:#1f2937;       /* sade */
+      --btnText:#e5e7eb;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --accent:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Arial, sans-serif;
+    }
+    .wrap{width:min(820px, 94vw); padding:18px;}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 14px 34px rgba(0,0,0,.35);
+    }
+    .topbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .pill{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      font-size:15px;
+    }
+    .pill b{font-size:18px}
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    select{
+      background:#0b1220;
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:15px;
+      outline:none;
+    }
+    .qbox{
+      margin:12px 0 14px;
+      border-radius:18px;
+      background:#0b1220;
+      border:1px solid var(--border);
+      padding:18px 14px;
+      text-align:center;
+    }
+    .question{
+      font-weight:800;
+      letter-spacing:.5px;
+      font-size: clamp(44px, 8vw, 84px); /* kocaman */
+      line-height:1.05;
+      margin:0;
+    }
+    .sub{
+      margin:10px 0 0;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .answers{
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width:640px){
+      .answers{grid-template-columns:1fr;}
+    }
+    .ans{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px 12px;
+      background:var(--btn);     /* sade buton */
+      color:var(--btnText);
+      font-weight:900;
+      cursor:pointer;
+      font-size: clamp(28px, 6vw, 52px); /* kocaman rakam */
+      line-height:1;
+      transition: transform .05s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .ans:active{transform:scale(.99)}
+    .ans[disabled]{opacity:.95; cursor:default}
+    .ans.ok{background:rgba(34,197,94,.22); border-color:rgba(34,197,94,.55)}
+    .ans.bad{background:rgba(239,68,68,.22); border-color:rgba(239,68,68,.55)}
+    .ans.color1{background:rgba(245,158,11,.20)}
+    .ans.color2{background:rgba(59,130,246,.18)}
+    .ans.color3{background:rgba(236,72,153,.18)}
+    .bottom{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .btn{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:var(--text);
+      font-weight:800;
+      cursor:pointer;
+      font-size:15px;
+    }
+    .btn.primary{
+      background:rgba(245,158,11,.18);
+      border-color:rgba(245,158,11,.45);
+    }
+    .msg{
+      font-size:15px;
+      color:var(--muted);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,.14);
+      background:rgba(255,255,255,.03);
+      flex: 1 1 auto;
+      min-width: 220px;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Toplama Oyunu (Aşamalı)</h1>
+      <div class="topbar">
+        <div class="pill">Puan: <b id="score">0</b></div>
 
-      <div class="row" style="margin-bottom:12px;">
-        <div>
-          <label>Grup</label>
+        <div class="controls">
           <select id="group">
             <option value="1">1. Grup (0–5 + 0–5)</option>
             <option value="2">2. Grup (0–9 + 0–9)</option>
             <option value="3">3. Grup (0–20 + 0–10)</option>
           </select>
-        </div>
-        <div>
-          <label>Hedef (doğru sayısı)</label>
-          <select id="target">
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20" selected>20</option>
-          </select>
+          <button class="btn primary" id="newBtn">Yeni Soru</button>
+          <button class="btn" id="resetBtn">Sıfırla</button>
         </div>
       </div>
 
-      <div class="meta" style="margin-bottom:8px;">
-        <div class="pill">Doğru: <b id="correct">0</b></div>
-        <div class="pill">Yanlış: <b id="wrong">0</b></div>
-        <div class="pill">Seri: <b id="streak">0</b></div>
-        <div class="pill">Soru: <b id="qno">0</b></div>
+      <div class="qbox">
+        <p class="question" id="question">—</p>
+        <p class="sub" id="hint">Yeni Soru’ya bas.</p>
       </div>
 
-      <div class="big" id="question">—</div>
-
-      <div class="row">
-        <div>
-          <label>Cevabın</label>
-          <input id="answer" inputmode="numeric" autocomplete="off" placeholder="Sonucu yaz" />
-        </div>
-        <div style="flex:0 0 160px;">
-          <label>&nbsp;</label>
-          <button class="btn2" id="checkBtn">Kontrol</button>
-        </div>
+      <div class="answers">
+        <button class="ans color1" id="a1">-</button>
+        <button class="ans color2" id="a2">-</button>
+        <button class="ans color3" id="a3">-</button>
       </div>
 
-      <div class="footer">
-        <button class="btn" id="newBtn">Yeni Soru</button>
-        <button class="btn3" id="resetBtn">Sıfırla</button>
-      </div>
-
-      <div id="msg" class="msg muted">Başlamak için “Yeni Soru”ya bas.</div>
-      <div class="muted" style="margin-top:10px;">
-        Not: Veriler tarayıcıda tutulur (localStorage). Veritabanı yoktur.
+      <div class="bottom">
+        <div class="msg" id="msg">Cevabı seç.</div>
       </div>
     </div>
   </div>
@@ -87,157 +190,166 @@
 <script>
 (() => {
   const els = {
+    score: document.getElementById('score'),
     group: document.getElementById('group'),
-    target: document.getElementById('target'),
-    correct: document.getElementById('correct'),
-    wrong: document.getElementById('wrong'),
-    streak: document.getElementById('streak'),
-    qno: document.getElementById('qno'),
     question: document.getElementById('question'),
-    answer: document.getElementById('answer'),
+    hint: document.getElementById('hint'),
     msg: document.getElementById('msg'),
     newBtn: document.getElementById('newBtn'),
-    checkBtn: document.getElementById('checkBtn'),
     resetBtn: document.getElementById('resetBtn'),
+    a1: document.getElementById('a1'),
+    a2: document.getElementById('a2'),
+    a3: document.getElementById('a3'),
   };
 
-  const LS_KEY = "toplama_oyunu_v1";
+  const LS_KEY = "toplama_oyunu_buton_v1";
 
-  let state = loadState() ?? {
+  let state = load() ?? {
+    score: 0,
     group: "1",
-    target: 20,
-    correct: 0,
-    wrong: 0,
-    streak: 0,
-    qno: 0,
     a: null,
-    b: null
+    b: null,
+    correct: null,
+    locked: false
   };
 
-  function loadState() {
-    try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
-  }
-  function saveState() {
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
-  }
+  function load(){ try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; } }
+  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
-  function rngInt(min, max) { // inclusive
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function limitsByGroup(g) {
-    if (g === "1") return { aMax: 5, bMax: 5 };
-    if (g === "2") return { aMax: 9, bMax: 9 };
-    return { aMax: 20, bMax: 10 }; // group 3
-  }
-
-  function render() {
-    els.group.value = state.group;
-    els.target.value = String(state.target);
-    els.correct.textContent = state.correct;
-    els.wrong.textContent = state.wrong;
-    els.streak.textContent = state.streak;
-    els.qno.textContent = state.qno;
-
-    if (state.a === null || state.b === null) {
-      els.question.textContent = "—";
-    } else {
-      els.question.textContent = `${state.a} + ${state.b} = ?`;
+  function rngInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function shuffle(arr){
+    for (let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
   }
 
-  function setMessage(text, type = "neutral") {
-    els.msg.className = "msg muted";
-    if (type === "ok") els.msg.classList.add("ok");
-    if (type === "bad") els.msg.classList.add("bad");
-    els.msg.textContent = text;
+  function limitsByGroup(g){
+    if (g === "1") return { aMax: 5,  bMax: 5  };
+    if (g === "2") return { aMax: 9,  bMax: 9  };
+    return             { aMax: 20, bMax: 10 };
   }
 
-  function newQuestion() {
+  function setButtonsEnabled(on){
+    [els.a1, els.a2, els.a3].forEach(b => b.disabled = !on);
+  }
+
+  function clearButtonStates(){
+    [els.a1, els.a2, els.a3].forEach(b => {
+      b.classList.remove('ok','bad');
+    });
+  }
+
+  function render(){
+    els.score.textContent = state.score;
+    els.group.value = state.group;
+
+    if (state.a === null){
+      els.question.textContent = "—";
+      els.hint.textContent = "Yeni Soru’ya bas.";
+      [els.a1, els.a2, els.a3].forEach(b => b.textContent = "-");
+      setButtonsEnabled(false);
+      clearButtonStates();
+      return;
+    }
+
+    els.question.textContent = `${state.a} + ${state.b} = ?`;
+    els.hint.textContent = "Doğru cevabı seç.";
+
+    setButtonsEnabled(!state.locked);
+  }
+
+  function buildChoices(correct){
+    // 3 seçenek: 1 doğru + 2 yanlış (yakın sayılar)
+    const wrong1 = correct + rngInt(-3, 3) || (correct + 1);
+    let w1 = wrong1;
+    if (w1 === correct) w1 = correct + 2;
+
+    let w2 = correct + rngInt(-5, 5);
+    if (w2 === correct || w2 === w1) w2 = correct + 4;
+
+    // Negatif olmasın
+    if (w1 < 0) w1 = 0;
+    if (w2 < 0) w2 = 0;
+
+    const choices = shuffle([correct, w1, w2]);
+    return choices;
+  }
+
+  function newQuestion(){
+    state.locked = false;
+    clearButtonStates();
+
     const { aMax, bMax } = limitsByGroup(state.group);
     state.a = rngInt(0, aMax);
     state.b = rngInt(0, bMax);
-    state.qno += 1;
-    saveState();
-    render();
-    els.answer.value = "";
-    els.answer.focus();
-    setMessage("Cevabını yazıp “Kontrol”e bas.", "neutral");
-  }
+    state.correct = state.a + state.b;
 
-  function checkAnswer() {
-    if (state.a === null || state.b === null) {
-      setMessage("Önce “Yeni Soru”ya bas.", "bad");
-      return;
-    }
-    const val = els.answer.value.trim();
-    if (val === "" || !/^-?\d+$/.test(val)) {
-      setMessage("Lütfen sadece sayı gir.", "bad");
-      return;
-    }
+    const [c1, c2, c3] = buildChoices(state.correct);
+    els.a1.textContent = c1;
+    els.a2.textContent = c2;
+    els.a3.textContent = c3;
 
-    const user = parseInt(val, 10);
-    const correct = state.a + state.b;
-
-    if (user === correct) {
-      state.correct += 1;
-      state.streak += 1;
-      setMessage(`Doğru! (${state.a} + ${state.b} = ${correct})`, "ok");
-    } else {
-      state.wrong += 1;
-      state.streak = 0;
-      setMessage(`Yanlış. Doğru cevap: ${correct}`, "bad");
-    }
-
-    // Hedefe ulaştı mı?
-    if (state.correct >= state.target) {
-      setMessage(`Tebrikler! Hedef ${state.target} doğruya ulaştın. İstersen “Sıfırla” veya grubu değiştir.`, "ok");
-      state.a = null; state.b = null;
-    } else {
-      // bir sonraki soruya geç
-      state.a = null; state.b = null;
-    }
-
-    saveState();
+    setButtonsEnabled(true);
+    els.msg.textContent = "Cevabı seç.";
+    save();
     render();
   }
 
-  function resetAll() {
-    state.correct = 0;
-    state.wrong = 0;
-    state.streak = 0;
-    state.qno = 0;
-    state.a = null;
-    state.b = null;
-    saveState();
+  function onPick(btn){
+    if (state.locked || state.a === null) return;
+
+    state.locked = true;
+    setButtonsEnabled(false);
+
+    const picked = parseInt(btn.textContent, 10);
+    const correct = state.correct;
+
+    if (picked === correct){
+      state.score += 1;
+      btn.classList.add('ok');
+      els.msg.textContent = "Doğru! ✅";
+    } else {
+      btn.classList.add('bad');
+      els.msg.textContent = "Yanlış. ❌";
+      // Doğru olanı yeşil göster
+      [els.a1, els.a2, els.a3].forEach(b => {
+        if (parseInt(b.textContent, 10) === correct) b.classList.add('ok');
+      });
+    }
+
+    save();
     render();
-    setMessage("Sıfırlandı. “Yeni Soru”ya bas.", "neutral");
+
+    // 1.2 sn sonra yeni soru
+    setTimeout(() => {
+      state.a = null; state.b = null; state.correct = null; state.locked = false;
+      save();
+      newQuestion();
+    }, 1200);
+  }
+
+  function resetAll(){
+    state.score = 0;
+    state.a = null; state.b = null; state.correct = null; state.locked = false;
+    save();
+    els.msg.textContent = "Sıfırlandı. Yeni Soru’ya bas.";
+    render();
   }
 
   // events
+  els.newBtn.addEventListener('click', newQuestion);
+  els.resetBtn.addEventListener('click', resetAll);
   els.group.addEventListener('change', () => {
     state.group = els.group.value;
-    // grup değişince soru temizle
-    state.a = null; state.b = null;
-    saveState();
+    state.a = null; state.b = null; state.correct = null; state.locked = false;
+    save();
+    els.msg.textContent = "Grup seçildi. Yeni Soru’ya bas.";
     render();
-    setMessage("Grup değişti. “Yeni Soru”ya bas.", "neutral");
   });
 
-  els.target.addEventListener('change', () => {
-    state.target = parseInt(els.target.value, 10);
-    saveState();
-    setMessage("Hedef güncellendi.", "neutral");
-  });
-
-  els.newBtn.addEventListener('click', newQuestion);
-  els.checkBtn.addEventListener('click', () => { checkAnswer(); });
-
-  els.answer.addEventListener('keydown', (e) => {
-    if (e.key === "Enter") checkAnswer();
-  });
-
-  els.resetBtn.addEventListener('click', resetAll);
+  [els.a1, els.a2, els.a3].forEach(b => b.addEventListener('click', () => onPick(b)));
 
   // init
   render();
