@@ -94,7 +94,6 @@ input{
   background:rgba(245,158,11,.14);
 }
 
-/* Başla butonu: farklı renk ve daha büyük */
 .startBtn{
   padding:18px 44px;
   font-size:28px;
@@ -210,6 +209,16 @@ input{
   color:var(--accent);
   margin:0;
 }
+.badge{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  font-size:16px;
+}
 .restart{
   padding:16px 34px;
   font-size:22px;
@@ -273,6 +282,9 @@ input{
     <div class="center">
       <div class="title" id="resultTitle">Tebrikler</div>
       <div class="small" id="resultReason">—</div>
+
+      <div class="badge">Zorluk: <b id="resultDiff">Basit</b></div>
+
       <p class="scoreBig" id="finalScore">0</p>
       <div class="small">PUANIN</div>
       <button class="restart" id="restartBtn">Yeniden Başla</button>
@@ -292,12 +304,10 @@ input{
   };
 
   // Abartısız puanlama: 2–10 arası
-  // Kalan süreye göre 2 saniyelik dilimler
   function pointsFor(timeLeft){
-    // timeLeft 20..0 -> idx 0..10
     const idx = Math.floor((ROUND_TIME - timeLeft) / 2); // 0..10
-    const table = [10,9,8,7,6,5,4,3,2,2,2]; // yavaşsa 2
-    return table[Math.max(0, Math.min(table.length-1, idx))];
+    const table = [10,9,8,7,6,5,4,3,2,2,2];
+    return table[Math.max(0, Math.min(table.length - 1, idx))];
   }
 
   const screens = {
@@ -316,7 +326,6 @@ input{
     time: document.getElementById('time'),
     diffLabel: document.getElementById('diffLabel'),
     question: document.getElementById('question'),
-    hint: document.getElementById('hint'),
     timerFill: document.getElementById('timerFill'),
     msg: document.getElementById('msg'),
     a1: document.getElementById('a1'),
@@ -325,6 +334,7 @@ input{
 
     resultTitle: document.getElementById('resultTitle'),
     resultReason: document.getElementById('resultReason'),
+    resultDiff: document.getElementById('resultDiff'),
     finalScore: document.getElementById('finalScore'),
     restartBtn: document.getElementById('restartBtn'),
   };
@@ -333,8 +343,6 @@ input{
     name: "Öğrenci",
     diff: "easy",
     score: 0,
-    a: null,
-    b: null,
     correct: null,
     locked: false,
     timeLeft: ROUND_TIME,
@@ -383,7 +391,6 @@ input{
       state.timeLeft -= 1;
       renderHeader();
       if(state.timeLeft <= 0){
-        // süre doldu -> sonuç ekranında son puanı göster, sonra puanı sıfırla
         endGame("Süre doldu. Puan sıfırlandı.", state.score);
       }
     }, 1000);
@@ -405,11 +412,11 @@ input{
     setButtonsEnabled(true);
 
     const {aMax, bMax} = DIFFS[state.diff];
-    state.a = rngInt(0, aMax);
-    state.b = rngInt(0, bMax);
-    state.correct = state.a + state.b;
+    const a = rngInt(0, aMax);
+    const b = rngInt(0, bMax);
+    state.correct = a + b;
 
-    els.question.textContent = `${state.a} + ${state.b} = ?`;
+    els.question.textContent = `${a} + ${b} = ?`;
     els.msg.textContent = "Cevabı seç.";
 
     const [c1,c2,c3] = buildChoices(state.correct);
@@ -427,9 +434,14 @@ input{
 
     els.resultTitle.textContent = `Tebrikler ${state.name}`;
     els.resultReason.textContent = reason;
+
+    // sonuçta zorluk göster
+    els.resultDiff.textContent = DIFFS[state.diff].label;
+
+    // sonuçta son puanı büyük göster
     els.finalScore.textContent = finalScore;
 
-    // yeni oyun için puanı sıfırla (ekranda finalScore göründükten sonra)
+    // yeni oyun için puanı sıfırla
     state.score = 0;
     renderHeader();
 
@@ -455,7 +467,6 @@ input{
       setTimeout(() => {
         newQuestion();
       }, 600);
-
     } else {
       btn.classList.add('bad');
       [els.a1, els.a2, els.a3].forEach(b => {
@@ -482,11 +493,9 @@ input{
     stopTimer();
     state.score = 0;
     state.locked = false;
-    els.name.value = state.name === "Öğrenci" ? "" : state.name;
     show('start');
   }
 
-  // events
   els.diffBtns.forEach(b => {
     b.addEventListener('click', () => {
       els.diffBtns.forEach(x => x.classList.remove('selected'));
@@ -499,7 +508,6 @@ input{
   els.restartBtn.addEventListener('click', backToStart);
 
   [els.a1, els.a2, els.a3].forEach(b => b.addEventListener('click', () => pick(b)));
-
 })();
 </script>
 
