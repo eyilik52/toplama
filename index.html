@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Toplama Oyunu</title>
+  <style>
+    :root { font-family: Arial, sans-serif; }
+    body { margin:0; background:#0b1220; color:#e5e7eb; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 18px; }
+    .card { background:#0f1b33; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    h1 { margin:0 0 10px; font-size: 20px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row > * { flex: 1 1 auto; }
+    label { font-size: 13px; opacity:.9; display:block; margin-bottom:6px; }
+    select, input { width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0b1220; color:#e5e7eb; font-size:16px; }
+    button { padding:12px 14px; border:0; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; }
+    .btn { background:#f59e0b; color:#111827; }
+    .btn2 { background:#22c55e; color:#081018; }
+    .btn3 { background:#334155; color:#e5e7eb; }
+    .big { font-size: 44px; font-weight: 800; letter-spacing: .5px; text-align:center; margin: 14px 0; }
+    .meta { display:flex; gap:10px; flex-wrap:wrap; }
+    .pill { padding:8px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); font-size:13px; }
+    .msg { margin-top:12px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0b1220; }
+    .ok { border-color: rgba(34,197,94,.5); }
+    .bad { border-color: rgba(239,68,68,.5); }
+    .muted { opacity:.85; font-size: 13px; line-height: 1.35; }
+    .footer { margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Toplama Oyunu (Aşamalı)</h1>
+
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <label>Grup</label>
+          <select id="group">
+            <option value="1">1. Grup (0–5 + 0–5)</option>
+            <option value="2">2. Grup (0–9 + 0–9)</option>
+            <option value="3">3. Grup (0–20 + 0–10)</option>
+          </select>
+        </div>
+        <div>
+          <label>Hedef (doğru sayısı)</label>
+          <select id="target">
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20" selected>20</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="meta" style="margin-bottom:8px;">
+        <div class="pill">Doğru: <b id="correct">0</b></div>
+        <div class="pill">Yanlış: <b id="wrong">0</b></div>
+        <div class="pill">Seri: <b id="streak">0</b></div>
+        <div class="pill">Soru: <b id="qno">0</b></div>
+      </div>
+
+      <div class="big" id="question">—</div>
+
+      <div class="row">
+        <div>
+          <label>Cevabın</label>
+          <input id="answer" inputmode="numeric" autocomplete="off" placeholder="Sonucu yaz" />
+        </div>
+        <div style="flex:0 0 160px;">
+          <label>&nbsp;</label>
+          <button class="btn2" id="checkBtn">Kontrol</button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button class="btn" id="newBtn">Yeni Soru</button>
+        <button class="btn3" id="resetBtn">Sıfırla</button>
+      </div>
+
+      <div id="msg" class="msg muted">Başlamak için “Yeni Soru”ya bas.</div>
+      <div class="muted" style="margin-top:10px;">
+        Not: Veriler tarayıcıda tutulur (localStorage). Veritabanı yoktur.
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const els = {
+    group: document.getElementById('group'),
+    target: document.getElementById('target'),
+    correct: document.getElementById('correct'),
+    wrong: document.getElementById('wrong'),
+    streak: document.getElementById('streak'),
+    qno: document.getElementById('qno'),
+    question: document.getElementById('question'),
+    answer: document.getElementById('answer'),
+    msg: document.getElementById('msg'),
+    newBtn: document.getElementById('newBtn'),
+    checkBtn: document.getElementById('checkBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+  };
+
+  const LS_KEY = "toplama_oyunu_v1";
+
+  let state = loadState() ?? {
+    group: "1",
+    target: 20,
+    correct: 0,
+    wrong: 0,
+    streak: 0,
+    qno: 0,
+    a: null,
+    b: null
+  };
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
+  }
+  function saveState() {
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+
+  function rngInt(min, max) { // inclusive
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function limitsByGroup(g) {
+    if (g === "1") return { aMax: 5, bMax: 5 };
+    if (g === "2") return { aMax: 9, bMax: 9 };
+    return { aMax: 20, bMax: 10 }; // group 3
+  }
+
+  function render() {
+    els.group.value = state.group;
+    els.target.value = String(state.target);
+    els.correct.textContent = state.correct;
+    els.wrong.textContent = state.wrong;
+    els.streak.textContent = state.streak;
+    els.qno.textContent = state.qno;
+
+    if (state.a === null || state.b === null) {
+      els.question.textContent = "—";
+    } else {
+      els.question.textContent = `${state.a} + ${state.b} = ?`;
+    }
+  }
+
+  function setMessage(text, type = "neutral") {
+    els.msg.className = "msg muted";
+    if (type === "ok") els.msg.classList.add("ok");
+    if (type === "bad") els.msg.classList.add("bad");
+    els.msg.textContent = text;
+  }
+
+  function newQuestion() {
+    const { aMax, bMax } = limitsByGroup(state.group);
+    state.a = rngInt(0, aMax);
+    state.b = rngInt(0, bMax);
+    state.qno += 1;
+    saveState();
+    render();
+    els.answer.value = "";
+    els.answer.focus();
+    setMessage("Cevabını yazıp “Kontrol”e bas.", "neutral");
+  }
+
+  function checkAnswer() {
+    if (state.a === null || state.b === null) {
+      setMessage("Önce “Yeni Soru”ya bas.", "bad");
+      return;
+    }
+    const val = els.answer.value.trim();
+    if (val === "" || !/^-?\d+$/.test(val)) {
+      setMessage("Lütfen sadece sayı gir.", "bad");
+      return;
+    }
+
+    const user = parseInt(val, 10);
+    const correct = state.a + state.b;
+
+    if (user === correct) {
+      state.correct += 1;
+      state.streak += 1;
+      setMessage(`Doğru! (${state.a} + ${state.b} = ${correct})`, "ok");
+    } else {
+      state.wrong += 1;
+      state.streak = 0;
+      setMessage(`Yanlış. Doğru cevap: ${correct}`, "bad");
+    }
+
+    // Hedefe ulaştı mı?
+    if (state.correct >= state.target) {
+      setMessage(`Tebrikler! Hedef ${state.target} doğruya ulaştın. İstersen “Sıfırla” veya grubu değiştir.`, "ok");
+      state.a = null; state.b = null;
+    } else {
+      // bir sonraki soruya geç
+      state.a = null; state.b = null;
+    }
+
+    saveState();
+    render();
+  }
+
+  function resetAll() {
+    state.correct = 0;
+    state.wrong = 0;
+    state.streak = 0;
+    state.qno = 0;
+    state.a = null;
+    state.b = null;
+    saveState();
+    render();
+    setMessage("Sıfırlandı. “Yeni Soru”ya bas.", "neutral");
+  }
+
+  // events
+  els.group.addEventListener('change', () => {
+    state.group = els.group.value;
+    // grup değişince soru temizle
+    state.a = null; state.b = null;
+    saveState();
+    render();
+    setMessage("Grup değişti. “Yeni Soru”ya bas.", "neutral");
+  });
+
+  els.target.addEventListener('change', () => {
+    state.target = parseInt(els.target.value, 10);
+    saveState();
+    setMessage("Hedef güncellendi.", "neutral");
+  });
+
+  els.newBtn.addEventListener('click', newQuestion);
+  els.checkBtn.addEventListener('click', () => { checkAnswer(); });
+
+  els.answer.addEventListener('keydown', (e) => {
+    if (e.key === "Enter") checkAnswer();
+  });
+
+  els.resetBtn.addEventListener('click', resetAll);
+
+  // init
+  render();
+})();
+</script>
+</body>
+</html>
