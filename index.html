@@ -11,7 +11,7 @@
       --text:#e5e7eb;
       --muted:rgba(229,231,235,.75);
       --border:rgba(255,255,255,.10);
-      --btn:#1f2937;       /* sade */
+      --btn:#1f2937;
       --btnText:#e5e7eb;
       --ok:#22c55e;
       --bad:#ef4444;
@@ -28,7 +28,7 @@
       color:var(--text);
       font-family: Arial, sans-serif;
     }
-    .wrap{width:min(820px, 94vw); padding:18px;}
+    .wrap{width:min(860px, 94vw); padding:18px;}
     .card{
       background:var(--card);
       border:1px solid var(--border);
@@ -53,23 +53,14 @@
       background:rgba(255,255,255,.06);
       border:1px solid var(--border);
       font-size:15px;
+      white-space:nowrap;
     }
     .pill b{font-size:18px}
-    .controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+    .pill.accent{
+      border-color:rgba(245,158,11,.45);
+      background:rgba(245,158,11,.12);
     }
-    select{
-      background:#0b1220;
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:15px;
-      outline:none;
-    }
+
     .qbox{
       margin:12px 0 14px;
       border-radius:18px;
@@ -77,11 +68,13 @@
       border:1px solid var(--border);
       padding:18px 14px;
       text-align:center;
+      position:relative;
+      overflow:hidden;
     }
     .question{
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.5px;
-      font-size: clamp(44px, 8vw, 84px); /* kocaman */
+      font-size: clamp(44px, 8vw, 84px);
       line-height:1.05;
       margin:0;
     }
@@ -90,24 +83,39 @@
       font-size:14px;
       color:var(--muted);
     }
+
+    /* süre çubuğu */
+    .bar{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height:8px;
+      background:rgba(255,255,255,.06);
+    }
+    .bar > div{
+      height:100%;
+      width:100%;
+      background:rgba(245,158,11,.7);
+      transform-origin:left center;
+      transform:scaleX(1);
+    }
+
     .answers{
       display:grid;
       gap:12px;
       grid-template-columns: repeat(3, 1fr);
     }
-    @media (max-width:640px){
-      .answers{grid-template-columns:1fr;}
-    }
+    @media (max-width:640px){ .answers{grid-template-columns:1fr;} }
+
     .ans{
       width:100%;
       border:1px solid var(--border);
       border-radius:18px;
       padding:16px 12px;
-      background:var(--btn);     /* sade buton */
+      background:var(--btn);
       color:var(--btnText);
       font-weight:900;
       cursor:pointer;
-      font-size: clamp(28px, 6vw, 52px); /* kocaman rakam */
+      font-size: clamp(28px, 6vw, 52px);
       line-height:1;
       transition: transform .05s ease, background .12s ease, border-color .12s ease;
       user-select:none;
@@ -119,102 +127,234 @@
     .ans.color1{background:rgba(245,158,11,.20)}
     .ans.color2{background:rgba(59,130,246,.18)}
     .ans.color3{background:rgba(236,72,153,.18)}
-    .bottom{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .btn{
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:#0b1220;
-      color:var(--text);
-      font-weight:800;
-      cursor:pointer;
-      font-size:15px;
-    }
-    .btn.primary{
-      background:rgba(245,158,11,.18);
-      border-color:rgba(245,158,11,.45);
-    }
+
     .msg{
+      margin-top:14px;
       font-size:15px;
       color:var(--muted);
       padding:10px 12px;
       border-radius:14px;
       border:1px dashed rgba(255,255,255,.14);
       background:rgba(255,255,255,.03);
-      flex: 1 1 auto;
-      min-width: 220px;
     }
+
+    /* ekranlar */
+    .screen{display:none}
+    .screen.active{display:block}
+
+    .title{
+      text-align:center;
+      font-size: clamp(26px, 6vw, 40px);
+      font-weight:900;
+      margin:6px 0 10px;
+      letter-spacing:.4px;
+    }
+    .center{
+      display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center;
+      text-align:center;
+      padding:10px 4px;
+    }
+    .field{
+      width:min(520px, 100%);
+      text-align:left;
+    }
+    label{display:block; margin:0 0 6px; font-size:14px; color:var(--muted)}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:var(--text);
+      font-size:16px;
+      outline:none;
+    }
+    .difficulty{
+      width:min(520px, 100%);
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width:640px){ .difficulty{grid-template-columns:1fr;} }
+
+    .dBtn{
+      padding:14px 12px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:var(--text);
+      font-weight:900;
+      font-size:18px;
+      cursor:pointer;
+    }
+    .dBtn.selected{
+      border-color:rgba(245,158,11,.55);
+      background:rgba(245,158,11,.14);
+    }
+
+    .primary{
+      width:min(520px, 100%);
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(245,158,11,.55);
+      background:rgba(245,158,11,.18);
+      color:var(--text);
+      font-weight:900;
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    .bigScore{
+      font-size: clamp(42px, 10vw, 90px);
+      font-weight:1000;
+      letter-spacing:1px;
+      color:var(--accent);
+      margin:6px 0 0;
+    }
+    .smallNote{color:var(--muted); font-size:14px; line-height:1.4}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="topbar">
-        <div class="pill">Puan: <b id="score">0</b></div>
 
-        <div class="controls">
-          <select id="group">
-            <option value="1">1. Grup (0–5 + 0–5)</option>
-            <option value="2">2. Grup (0–9 + 0–9)</option>
-            <option value="3">3. Grup (0–20 + 0–10)</option>
-          </select>
-          <button class="btn primary" id="newBtn">Yeni Soru</button>
-          <button class="btn" id="resetBtn">Sıfırla</button>
+      <!-- BAŞLANGIÇ EKRANI -->
+      <div class="screen active" id="startScreen">
+        <div class="center">
+          <div class="title">Toplama Oyunu</div>
+          <div class="smallNote">İsmini yaz, zorluk seç ve başla.</div>
+
+          <div class="field">
+            <label>İsim</label>
+            <input id="nameInput" maxlength="16" placeholder="Örn: Ali" />
+          </div>
+
+          <div class="field">
+            <label>Zorluk</label>
+          </div>
+          <div class="difficulty">
+            <button class="dBtn selected" data-diff="easy">Basit</button>
+            <button class="dBtn" data-diff="mid">Orta</button>
+            <button class="dBtn" data-diff="hard">Zor</button>
+          </div>
+
+          <button class="primary" id="startBtn">Başla</button>
+
+          <div class="smallNote">
+            Süre: <b>20 saniye</b>. Süre biterse veya yanlış yaparsan puan sıfırlanır ve sonuç ekranı gelir.
+          </div>
         </div>
       </div>
 
-      <div class="qbox">
-        <p class="question" id="question">—</p>
-        <p class="sub" id="hint">Yeni Soru’ya bas.</p>
-      </div>
+      <!-- OYUN EKRANI -->
+      <div class="screen" id="gameScreen">
+        <div class="topbar">
+          <div class="pill">İsim: <b id="playerName">—</b></div>
+          <div class="pill accent">Puan: <b id="score">0</b></div>
+          <div class="pill">Süre: <b id="time">20</b>s</div>
+          <div class="pill">Zorluk: <b id="diffLabel">Basit</b></div>
+        </div>
 
-      <div class="answers">
-        <button class="ans color1" id="a1">-</button>
-        <button class="ans color2" id="a2">-</button>
-        <button class="ans color3" id="a3">-</button>
-      </div>
+        <div class="qbox">
+          <p class="question" id="question">—</p>
+          <p class="sub" id="hint">Cevabı seç.</p>
+          <div class="bar"><div id="barFill"></div></div>
+        </div>
 
-      <div class="bottom">
+        <div class="answers">
+          <button class="ans color1" id="a1">-</button>
+          <button class="ans color2" id="a2">-</button>
+          <button class="ans color3" id="a3">-</button>
+        </div>
+
         <div class="msg" id="msg">Cevabı seç.</div>
       </div>
+
+      <!-- SONUÇ EKRANI -->
+      <div class="screen" id="resultScreen">
+        <div class="center">
+          <div class="title" id="resultTitle">Tebrikler!</div>
+          <div class="smallNote" id="resultReason">—</div>
+          <div class="bigScore" id="finalScore">0</div>
+          <div class="smallNote">PUANIN</div>
+          <button class="primary" id="restartBtn">Yeniden Başla</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
 <script>
 (() => {
+  // ---- Ayarlar ----
+  const ROUND_TIME = 20; // saniye
+
+  // Zorluklar (senin grupların sadeleştirilmiş hali)
+  // Basit: 0–5 + 0–5
+  // Orta : 0–9 + 0–9
+  // Zor  : 0–20 + 0–10
+  const DIFFS = {
+    easy: { label: "Basit", aMax: 5,  bMax: 5  },
+    mid:  { label: "Orta",  aMax: 9,  bMax: 9  },
+    hard: { label: "Zor",   aMax: 20, bMax: 10 }
+  };
+
+  // Puanlama: ne kadar hızlıysa o kadar fazla
+  // Kalan saniye 20 -> 20 puan, 10 -> 10 puan gibi
+  // En az 1 puan
+  const pointsFor = (timeLeft) => Math.max(1, Math.ceil(timeLeft));
+
+  // ---- Elemanlar ----
+  const screens = {
+    start: document.getElementById('startScreen'),
+    game: document.getElementById('gameScreen'),
+    result: document.getElementById('resultScreen'),
+  };
+
   const els = {
+    // start
+    nameInput: document.getElementById('nameInput'),
+    startBtn: document.getElementById('startBtn'),
+    diffBtns: Array.from(document.querySelectorAll('.dBtn')),
+
+    // game
+    playerName: document.getElementById('playerName'),
     score: document.getElementById('score'),
-    group: document.getElementById('group'),
+    time: document.getElementById('time'),
+    diffLabel: document.getElementById('diffLabel'),
     question: document.getElementById('question'),
     hint: document.getElementById('hint'),
     msg: document.getElementById('msg'),
-    newBtn: document.getElementById('newBtn'),
-    resetBtn: document.getElementById('resetBtn'),
+    barFill: document.getElementById('barFill'),
     a1: document.getElementById('a1'),
     a2: document.getElementById('a2'),
     a3: document.getElementById('a3'),
+
+    // result
+    resultTitle: document.getElementById('resultTitle'),
+    resultReason: document.getElementById('resultReason'),
+    finalScore: document.getElementById('finalScore'),
+    restartBtn: document.getElementById('restartBtn'),
   };
 
-  const LS_KEY = "toplama_oyunu_buton_v1";
-
-  let state = load() ?? {
+  // ---- Durum ----
+  let state = {
+    name: "",
+    diff: "easy",
     score: 0,
-    group: "1",
     a: null,
     b: null,
     correct: null,
-    locked: false
+    locked: false,
+    timeLeft: ROUND_TIME,
+    timerId: null,
+    tickId: null
   };
 
-  function load(){ try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; } }
-  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  function showScreen(which){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[which].classList.add('active');
+  }
 
   function rngInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
   function shuffle(arr){
@@ -225,81 +365,99 @@
     return arr;
   }
 
-  function limitsByGroup(g){
-    if (g === "1") return { aMax: 5,  bMax: 5  };
-    if (g === "2") return { aMax: 9,  bMax: 9  };
-    return             { aMax: 20, bMax: 10 };
-  }
-
   function setButtonsEnabled(on){
     [els.a1, els.a2, els.a3].forEach(b => b.disabled = !on);
   }
-
   function clearButtonStates(){
-    [els.a1, els.a2, els.a3].forEach(b => {
-      b.classList.remove('ok','bad');
-    });
-  }
-
-  function render(){
-    els.score.textContent = state.score;
-    els.group.value = state.group;
-
-    if (state.a === null){
-      els.question.textContent = "—";
-      els.hint.textContent = "Yeni Soru’ya bas.";
-      [els.a1, els.a2, els.a3].forEach(b => b.textContent = "-");
-      setButtonsEnabled(false);
-      clearButtonStates();
-      return;
-    }
-
-    els.question.textContent = `${state.a} + ${state.b} = ?`;
-    els.hint.textContent = "Doğru cevabı seç.";
-
-    setButtonsEnabled(!state.locked);
+    [els.a1, els.a2, els.a3].forEach(b => b.classList.remove('ok','bad'));
   }
 
   function buildChoices(correct){
-    // 3 seçenek: 1 doğru + 2 yanlış (yakın sayılar)
-    const wrong1 = correct + rngInt(-3, 3) || (correct + 1);
-    let w1 = wrong1;
+    // 1 doğru + 2 yanlış
+    let w1 = correct + rngInt(-3, 3);
     if (w1 === correct) w1 = correct + 2;
-
     let w2 = correct + rngInt(-5, 5);
     if (w2 === correct || w2 === w1) w2 = correct + 4;
 
-    // Negatif olmasın
     if (w1 < 0) w1 = 0;
     if (w2 < 0) w2 = 0;
 
-    const choices = shuffle([correct, w1, w2]);
-    return choices;
+    return shuffle([correct, w1, w2]);
+  }
+
+  function renderGameHeader(){
+    els.playerName.textContent = state.name || "—";
+    els.score.textContent = state.score;
+    els.time.textContent = state.timeLeft;
+    els.diffLabel.textContent = DIFFS[state.diff].label;
+
+    const p = state.timeLeft / ROUND_TIME;
+    els.barFill.style.transform = `scaleX(${Math.max(0, Math.min(1, p))})`;
+  }
+
+  function stopTimer(){
+    if (state.timerId) clearInterval(state.timerId);
+    state.timerId = null;
+  }
+
+  function startTimer(){
+    stopTimer();
+    state.timeLeft = ROUND_TIME;
+    renderGameHeader();
+
+    state.timerId = setInterval(() => {
+      state.timeLeft -= 1;
+      renderGameHeader();
+
+      if (state.timeLeft <= 0){
+        // süre bitti: puan sıfır + sonuç
+        endGame("Süre doldu. Puan sıfırlandı.");
+      }
+    }, 1000);
   }
 
   function newQuestion(){
     state.locked = false;
     clearButtonStates();
+    setButtonsEnabled(true);
 
-    const { aMax, bMax } = limitsByGroup(state.group);
+    const { aMax, bMax } = DIFFS[state.diff];
     state.a = rngInt(0, aMax);
     state.b = rngInt(0, bMax);
     state.correct = state.a + state.b;
+
+    els.question.textContent = `${state.a} + ${state.b} = ?`;
+    els.hint.textContent = "Doğru cevabı seç.";
+    els.msg.textContent = "Cevabı seç.";
 
     const [c1, c2, c3] = buildChoices(state.correct);
     els.a1.textContent = c1;
     els.a2.textContent = c2;
     els.a3.textContent = c3;
 
-    setButtonsEnabled(true);
-    els.msg.textContent = "Cevabı seç.";
-    save();
-    render();
+    // her soru için süreyi resetle
+    startTimer();
   }
 
-  function onPick(btn){
-    if (state.locked || state.a === null) return;
+  function endGame(reason){
+    // puan sıfırla
+    state.score = 0;
+    renderGameHeader();
 
+    // ekran geçişi
+    stopTimer();
+    state.locked = true;
+    setButtonsEnabled(false);
+
+    els.resultTitle.textContent = `Tebrikler ${state.name || ""}`.trim();
+    els.resultReason.textContent = reason;
+    els.finalScore.textContent = state.score;
+
+    showScreen('result');
+  }
+
+  function pick(btn){
+    if (state.locked) return;
     state.locked = true;
     setButtonsEnabled(false);
 
@@ -307,52 +465,68 @@
     const correct = state.correct;
 
     if (picked === correct){
-      state.score += 1;
+      // hızlı çözdükçe puan fazla
+      const add = pointsFor(state.timeLeft);
+      state.score += add;
+      renderGameHeader();
+
       btn.classList.add('ok');
-      els.msg.textContent = "Doğru! ✅";
+      els.msg.textContent = `Doğru! +${add} puan`;
+
+      // kısa bekleyip yeni soru
+      setTimeout(() => {
+        state.locked = false;
+        newQuestion();
+      }, 650);
+
     } else {
       btn.classList.add('bad');
-      els.msg.textContent = "Yanlış. ❌";
-      // Doğru olanı yeşil göster
+      // doğruyu yeşil göster
       [els.a1, els.a2, els.a3].forEach(b => {
         if (parseInt(b.textContent, 10) === correct) b.classList.add('ok');
       });
+      els.msg.textContent = "Yanlış! Puan sıfırlandı.";
+      // yanlışta oyun biter + puan sıfır
+      setTimeout(() => {
+        endGame("Yanlış yaptın. Puan sıfırlandı.");
+      }, 700);
     }
-
-    save();
-    render();
-
-    // 1.2 sn sonra yeni soru
-    setTimeout(() => {
-      state.a = null; state.b = null; state.correct = null; state.locked = false;
-      save();
-      newQuestion();
-    }, 1200);
   }
 
-  function resetAll(){
+  // ---- Başlatma akışı ----
+  function startGame(){
+    state.name = (els.nameInput.value || "").trim().slice(0, 16);
+    if (!state.name) state.name = "Öğrenci";
+
+    showScreen('game');
     state.score = 0;
-    state.a = null; state.b = null; state.correct = null; state.locked = false;
-    save();
-    els.msg.textContent = "Sıfırlandı. Yeni Soru’ya bas.";
-    render();
+    renderGameHeader();
+    newQuestion();
   }
 
-  // events
-  els.newBtn.addEventListener('click', newQuestion);
-  els.resetBtn.addEventListener('click', resetAll);
-  els.group.addEventListener('change', () => {
-    state.group = els.group.value;
-    state.a = null; state.b = null; state.correct = null; state.locked = false;
-    save();
-    els.msg.textContent = "Grup seçildi. Yeni Soru’ya bas.";
-    render();
+  function resetToStart(){
+    stopTimer();
+    state.score = 0;
+    state.a = null; state.b = null; state.correct = null;
+    state.locked = false;
+    els.msg.textContent = "Cevabı seç.";
+    showScreen('start');
+  }
+
+  // ---- Events ----
+  els.diffBtns.forEach(b => {
+    b.addEventListener('click', () => {
+      els.diffBtns.forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      state.diff = b.dataset.diff;
+    });
   });
 
-  [els.a1, els.a2, els.a3].forEach(b => b.addEventListener('click', () => onPick(b)));
+  els.startBtn.addEventListener('click', startGame);
+  els.restartBtn.addEventListener('click', resetToStart);
 
-  // init
-  render();
+  [els.a1, els.a2, els.a3].forEach(b => b.addEventListener('click', () => pick(b)));
+
 })();
 </script>
 </body>
